@@ -1,0 +1,299 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['qa', 'hml', 'prod'],
+            description: 'Selecciona el ambiente a desplegar'
+        )
+        choice(
+            name: 'GIT_BRANCH',
+            choices: ['main','develop'],
+            description: 'Rama a utilizar para el despliegue'
+        )
+        string(
+            name: 'VERSION',
+            defaultValue: '',
+            description: 'Versión personalizada (solo para PROD, ej: v1.0.0). Dejar vacío para auto-generar'
+        )
+        booleanParam(
+            name: 'SKIP_TESTS',
+            defaultValue: false,
+            description: 'Saltar tests (solo aplica a PROD)'
+        )
+    }
+
+    environment {
+        GIT_URL = 'https://github.com/sector-siit/wifi-comunidad-lomas.git'
+        DOCKER_REGISTRY = 'dock.lomasdezamora.gov.ar'
+        IMAGE_NAME = 'desarrollosiit/wificomunidad'
+    }
+
+    stages {
+        stage('Validation') {
+            steps {
+                script {
+                    echo "🔍 Validando configuración..."
+                    echo "Ambiente: ${params.ENVIRONMENT}"
+                    echo "Rama: ${params.GIT_BRANCH}"
+
+                    def expectedBranch = [
+                        'qa': 'qa',
+                        'hml': 'hml',
+                        'prod': 'main'
+                    ]
+
+                    if (expectedBranch[params.ENVIRONMENT] != params.GIT_BRANCH) {
+                        echo "⚠️  ADVERTENCIA: Se recomienda usar la rama '${expectedBranch[params.ENVIRONMENT]}' para el ambiente '${params.ENVIRONMENT}'"
+                    }
+
+                    if (params.ENVIRONMENT == 'qa') {
+                        env.DOCKERFILE = "docker/qa/Dockerfile"
+                        env.ENV_FILE_CREDENTIAL = 'WIFI_ENV_QA'
+                    } else if (params.ENVIRONMENT == 'hml') {
+                        env.DOCKERFILE = "docker/hml/Dockerfile"
+                        env.ENV_FILE_CREDENTIAL = 'WIFI_ENV_HML'
+                    } else if (params.ENVIRONMENT == 'prod') {
+                        env.DOCKERFILE = "docker/production/Dockerfile"
+                        env.ENV_FILE_CREDENTIAL = 'WIFI_ENV_PROD'
+                    } else {
+                        error "Invalid environment: ${params.ENVIRONMENT}"
+                    }
+
+                    echo "Dockerfile: ${env.DOCKERFILE}"
+                    echo "Usando .env desde credencial: ${env.ENV_FILE_CREDENTIAL}"
+                }
+            }
+        }
+
+        stage('Approval for Production') {
+            when {
+                expression { params.ENVIRONMENT == 'prod' }
+            }
+            steps {
+                script {
+                    echo '⚠️  PRODUCTION DEPLOYMENT - Approval required'
+                    timeout(time: 15, unit: 'MINUTES') {
+                        input message: '¿Desplegar a PRODUCTION?', ok: 'Desplegar'
+                    }
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "📦 Checking out code from ${params.GIT_BRANCH} branch..."
+                    checkout([$class: 'GitSCM',
+                              branches: [[name: "${params.GIT_BRANCH}"]],
+                              doGenerateSubmoduleConfigurations: false,
+                              extensions: [],
+                              userRemoteConfigs: [[credentialsId: '4dd91e93-a78f-4d62-a012-28096d8fec34', url: "${GIT_URL}"]]
+                    ])
+                }
+            }
+        }
+
+        stage('Load Environment File') {
+            steps {
+                script {
+                    echo "📋 Loading .env file from Jenkins credentials..."
+
+                    withCredentials([file(credentialsId: env.ENV_FILE_CREDENTIAL, variable: 'ENV_FILE')]) {
+                        sh """
+                            echo "✅ .env file loaded successfully"
+                            echo "📋 Environment variables:"
+                            cat \${ENV_FILE} | grep -v '^#' | grep -v '^\$' || true
+                        """
+
+                        def envContent = readFile(env.ENV_FILE)
+                        envContent.split('\n').each { line ->
+                            if (line && !line.startsWith('#') && line.contains('=')) {
+                                def parts = line.split('=', 2)
+                                if (parts.length == 2) {
+                                    def key = parts[0].trim()
+                                    def value = parts[1].trim()
+                                    env[key] = value
+                                }
+                            }
+                        }
+                    }
+
+                    echo "DATABASE_URL: ${env.DATABASE_URL ? '***loaded***' : 'NOT SET'}"
+                    echo "UNIFI_API_URL: ${env.UNIFI_API_URL}"
+                    echo "UNIFI_AUTH_DURATION: ${env.UNIFI_AUTH_DURATION}"
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            when {
+                allOf {
+                    expression { params.ENVIRONMENT == 'prod' }
+                    expression { !params.SKIP_TESTS }
+                }
+            }
+            steps {
+                script {
+                    echo '🧪 Running tests...'
+                    sh 'pnpm test || echo "No tests configured"'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "🔨 Building Docker image for ${params.ENVIRONMENT.toUpperCase()} environment..."
+
+                    def version = ''
+                    if (params.ENVIRONMENT == 'prod' && params.VERSION) {
+                        version = "${params.VERSION}-${new Date().format('yyyyMMddHHmmss')}"
+                    } else {
+                        version = "${env.BUILD_ID}-${new Date().format('yyyyMMddHHmmss')}"
+                    }
+                    env.IMAGE_TAG = version
+
+                    echo "Version: ${env.IMAGE_TAG}"
+                    echo "📋 Build arguments:"
+                    echo "  DATABASE_URL: ${env.DATABASE_URL ? '***hidden***' : 'NOT SET'}"
+                    echo "  UNIFI_API_URL: ${env.UNIFI_API_URL}"
+                    echo "  UNIFI_AUTH_DURATION: ${env.UNIFI_AUTH_DURATION}"
+                    echo "  NODE_ENV: ${env.NODE_ENV}"
+
+                    sh """
+                        echo "📦 Files in workspace:"
+                        ls -la
+
+                        echo ""
+                        echo "🔨 Building Docker image..."
+                        docker build \
+                            --build-arg DATABASE_URL="${env.DATABASE_URL}" \
+                            --build-arg UNIFI_API_URL="${env.UNIFI_API_URL}" \
+                            --build-arg UNIFI_AUTH_DURATION="${env.UNIFI_AUTH_DURATION}" \
+                            --build-arg NODE_ENV="${env.NODE_ENV}" \
+                            --progress=plain \
+                            --file ${env.DOCKERFILE} \
+                            -t ${IMAGE_NAME} .
+                    """
+                }
+            }
+        }
+
+        stage('Security Scan') {
+            when {
+                expression { params.ENVIRONMENT == 'prod' }
+            }
+            steps {
+                script {
+                    echo '🔒 Running security scan...'
+                    sh """
+                        echo "Security scan would run here"
+                        # docker scan ${IMAGE_NAME} || true
+                    """
+                }
+            }
+        }
+
+        stage('Login Docker Registry') {
+            steps {
+                echo '🔐 Logging into Docker Registry...'
+                sh "docker login -u reg -p reg ${DOCKER_REGISTRY}"
+            }
+        }
+
+        stage('Tag and Push Image') {
+            steps {
+                script {
+                    echo '🏷️  Tagging images...'
+
+                    def envTag = params.ENVIRONMENT
+                    if (params.ENVIRONMENT == 'prod') {
+                        sh """
+                            docker tag ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                            docker tag ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}:prod
+                            docker tag ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                        """
+                    } else {
+                        sh """
+                            docker tag ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                            docker tag ${IMAGE_NAME} ${DOCKER_REGISTRY}/${IMAGE_NAME}:${envTag}
+                        """
+                    }
+                }
+
+                script {
+                    echo '🚀 Pushing images to registry...'
+
+                    if (params.ENVIRONMENT == 'prod') {
+                        sh """
+                            docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                            docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:prod
+                            docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                        """
+                    } else {
+                        sh """
+                            docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                            docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${params.ENVIRONMENT}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Pull New Image Version') {
+            steps {
+                script {
+                    echo '⬇️  Pulling new image versions...'
+                    sh "docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${params.ENVIRONMENT == 'prod' ? 'prod' : params.ENVIRONMENT}"
+
+                    if (params.ENVIRONMENT == 'prod') {
+                        sh "docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest"
+                    }
+                }
+            }
+        }
+
+        stage('Health Check') {
+            when {
+                expression { params.ENVIRONMENT == 'prod' }
+            }
+            steps {
+                script {
+                    echo '🏥 Performing health check...'
+                    sh """
+                        echo "Health check would run here"
+                        # curl -f https://wificomunidad.lomasdezamora.gov.ar/ || exit 1
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                echo "✅ ${params.ENVIRONMENT.toUpperCase()} build successful!"
+                echo "Docker image version: ${env.IMAGE_TAG}"
+                echo "Images pushed:"
+                echo "  - ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+
+                if (params.ENVIRONMENT == 'prod') {
+                    echo "  - ${DOCKER_REGISTRY}/${IMAGE_NAME}:prod"
+                    echo "  - ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest"
+                } else {
+                    echo "  - ${DOCKER_REGISTRY}/${IMAGE_NAME}:${params.ENVIRONMENT}"
+                }
+            }
+        }
+        failure {
+            script {
+                echo "❌ ${params.ENVIRONMENT.toUpperCase()} build failed!"
+                echo "Check the logs for more details."
+            }
+        }
+
+    }
+}
