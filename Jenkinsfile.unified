@@ -27,7 +27,7 @@ pipeline {
     environment {
         GIT_URL = 'https://github.com/sector-siit/wifi-comunidad-lomas.git'
         DOCKER_REGISTRY = 'dock.lomasdezamora.gov.ar'
-        IMAGE_NAME = 'desarrollosiit/wificomunidad'
+        IMAGE_NAME = 'desarrollosiit/portalcautivo'
     }
 
     stages {
@@ -51,18 +51,22 @@ pipeline {
                     if (params.ENVIRONMENT == 'qa') {
                         env.DOCKERFILE = "docker/qa/Dockerfile"
                         env.ENV_FILE_CREDENTIAL = 'WIFI_ENV_QA'
+                        env.HEALTH_CHECK_URL = 'https://portalcautivoqa.lomasdezamora.gov.ar'
                     } else if (params.ENVIRONMENT == 'hml') {
                         env.DOCKERFILE = "docker/hml/Dockerfile"
                         env.ENV_FILE_CREDENTIAL = 'WIFI_ENV_HML'
+                        env.HEALTH_CHECK_URL = 'https://portalcautivohml.lomasdezamora.gov.ar'
                     } else if (params.ENVIRONMENT == 'prod') {
                         env.DOCKERFILE = "docker/production/Dockerfile"
                         env.ENV_FILE_CREDENTIAL = 'WIFI_ENV_PROD'
+                        env.HEALTH_CHECK_URL = 'https://portalcautivo.lomasdezamora.gov.ar'
                     } else {
                         error "Invalid environment: ${params.ENVIRONMENT}"
                     }
 
                     echo "Dockerfile: ${env.DOCKERFILE}"
                     echo "Usando .env desde credencial: ${env.ENV_FILE_CREDENTIAL}"
+                    echo "Health Check URL: ${env.HEALTH_CHECK_URL}"
                 }
             }
         }
@@ -262,10 +266,10 @@ pipeline {
             }
             steps {
                 script {
-                    echo '🏥 Performing health check...'
+                    echo "🏥 Performing health check against ${env.HEALTH_CHECK_URL}..."
                     sh """
                         echo "Health check would run here"
-                        # curl -f https://wificomunidad.lomasdezamora.gov.ar/ || exit 1
+                        # curl -f ${HEALTH_CHECK_URL}/ || exit 1
                     """
                 }
             }
