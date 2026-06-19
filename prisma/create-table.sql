@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS `WifiComunidad-Registro` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(100) NOT NULL,
+    `apellido` VARCHAR(100) NOT NULL,
+    `documento` VARCHAR(20) NOT NULL,
+    `celular` VARCHAR(20) NOT NULL,
+    `email` VARCHAR(255) NULL,
+    `sitioid` VARCHAR(100) NOT NULL,
+    `apMac` VARCHAR(20) NOT NULL,
+    `deviceMac` VARCHAR(20) NOT NULL,
+    `ssid` VARCHAR(100) NOT NULL,
+    `redirectUrl` VARCHAR(500) NULL DEFAULT '/',
+    `unifiTimestamp` BIGINT NULL,
+    `authorized` TINYINT NOT NULL DEFAULT 0,
+    `tiempo` INT NOT NULL DEFAULT 60,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (`id`),
+    INDEX `WifiComunidad-Registro_documento_idx` (`documento`),
+    INDEX `WifiComunidad-Registro_deviceMac_idx` (`deviceMac`),
+    INDEX `WifiComunidad-Registro_sitioid_idx` (`sitioid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model WifiComunidadRegistro {
+  id             Int      @id @default(autoincrement())
+  nombre         String
+  apellido       String
+  documento      String
+  celular        String
+  email          String?
+  sitioid        String
+  apMac          String
+  deviceMac      String
+  ssid           String
+  redirectUrl    String?  @default("/")
+  unifiTimestamp BigInt?
+  authorized     Boolean  @default(false)
+  tiempo         Int      @default(60)
+  createdAt      DateTime @default(now())
+
+  @@index([documento])
+  @@index([deviceMac])
+  @@index([sitioid])
+  @@map("WifiComunidad-Registro")
+}
