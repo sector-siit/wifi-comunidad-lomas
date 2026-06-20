@@ -12,6 +12,7 @@ model WifiComunidadRegistro {
   nombre         String
   apellido       String
   documento      String
+  tipoDocumento  String   @default("dni")
   celular        String
   email          String?
   sitioid        String

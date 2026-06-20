@@ -1,11 +1,40 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Geometria";
+  src: url("/fonts/Geometria-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Geometria";
+  src: url("/fonts/Geometria-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Geometria";
+  src: url("/fonts/Geometria-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Geometria";
+  src: url("/fonts/Geometria-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: bold;
+}
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --error: #dc2626;
+  --foreground: #3D3D3D;
+  --primary: #236999;
+  --primary-hover: #1F5A85;
+  --primary-400: #5BA8D5;
+  --error: #EF284C;
   --success: #16a34a;
 }
 
@@ -14,14 +43,14 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
+  --color-primary-400: var(--primary-400);
   --color-error: var(--error);
   --color-success: var(--success);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Geometria", sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: "Geometria", sans-serif;
 }

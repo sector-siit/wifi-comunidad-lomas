@@ -4,20 +4,29 @@ export const registerSchema = z.object({
   nombre: z
     .string()
     .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(100, "El nombre es demasiado largo"),
+    .max(100, "El nombre es demasiado largo")
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/, "El nombre no puede contener números ni caracteres especiales"),
   apellido: z
     .string()
     .min(2, "El apellido debe tener al menos 2 caracteres")
-    .max(100, "El apellido es demasiado largo"),
+    .max(100, "El apellido es demasiado largo")
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/, "El apellido no puede contener números ni caracteres especiales"),
   documento: z
     .string()
-    .min(6, "El documento debe tener al menos 6 caracteres")
-    .max(20, "El documento es demasiado largo"),
+    .min(7, "El documento debe tener 7 u 8 dígitos")
+    .max(8, "El documento debe tener 7 u 8 dígitos")
+    .regex(/^\d+$/, "El documento debe contener solo números"),
+  tipoDocumento: z.string().optional(),
   celular: z
     .string()
     .min(8, "El celular debe tener al menos 8 dígitos")
-    .max(20, "El celular es demasiado largo"),
-  email: z.string().email("Email inválido").optional().or(z.literal("")),
+    .max(10, "El celular debe tener como máximo 10 dígitos")
+    .regex(/^\d+$/, "El celular debe contener solo números"),
+  email: z
+    .string()
+    .email("Debe ingresar un email válido")
+    .optional()
+    .or(z.literal("")),
   terms: z.literal(true, {
     message: "Debe aceptar los términos y condiciones",
   }),
