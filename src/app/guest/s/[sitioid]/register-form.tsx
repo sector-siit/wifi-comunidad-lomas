@@ -3,6 +3,9 @@
 import { useActionState, useEffect, useState, useRef } from "react";
 import { registerUser } from "@/actions/register";
 import type { RegisterState } from "@/lib/validations";
+import Image from "next/image";
+import { Footer } from "@/components/footer";
+import logoForm from "@/../public/images/logo-form.png";
 
 const DOCUMENT_MAX_LENGTH = 8;
 
@@ -45,175 +48,191 @@ export function RegisterForm({
 
   if (state.success && state.redirectUrl) {
     return (
-      <div className="relative min-h-screen flex items-center justify-center px-4 py-8">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: "url(/fondo.jpg)",
-            filter: "blur(12px)",
-          }}
-        />
-        <div className="absolute inset-0 bg-white/20" />
-        <div className="relative z-10 w-full max-w-[432px] bg-white rounded shadow-lg p-8 text-center">
-          <p className="text-[#3D3D3D] text-lg">Redirigiendo...</p>
+      <div className="min-h-screen flex items-center justify-center bg-page p-4">
+        <div className="w-full max-w-form bg-white rounded-2xl shadow-lg p-8 text-center">
+          <p className="text-foreground text-lg">Redirigiendo...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 py-8">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: "url(/fondo.jpg)",
-          filter: "blur(12px)",
-        }}
-      />
-      <div className="absolute inset-0 bg-white/20" />
-
-      <div className="relative z-10 w-full max-w-[432px] bg-white rounded shadow-lg p-8">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-[#236999]">
-            WiFi Comunidad
-          </h1>
-          <p className="text-[#3D3D3D] mt-1">
-            Conectate a Internet gratis
-          </p>
-          <p className="text-sm text-[#5BA8D5] mt-1">
-            Red: {ssid}
-          </p>
-        </div>
-
-        {state.message && !state.success && (
-          <div className="mb-4 p-3 bg-[#EF284C]/10 border border-[#EF284C]/30 rounded text-[#EF284C] text-sm">
-            {state.message}
-          </div>
-        )}
-
-        <form action={formAction} className="space-y-4">
-          <input type="hidden" name="sitioid" value={sitioid} />
-          <input type="hidden" name="apMac" value={apMac} />
-          <input type="hidden" name="deviceMac" value={deviceMac} />
-          <input type="hidden" name="ssid" value={ssid} />
-          <input type="hidden" name="redirectUrl" value={redirectUrl} />
-          <input type="hidden" name="unifiTimestamp" value={unifiTimestamp} />
-
-          <div>
-            <label htmlFor="nombre" className="block font-bold text-[#236999] mb-2 text-base">
-              Nombre *
-            </label>
-            <input
-              type="text"
-              id="nombre"
-              name="nombre"
-              required
-              value={nombre}
-              onChange={(e) => setNombre(sanitizeTextoInput(e.target.value))}
-              className="w-full h-12 px-4 text-base text-[#236999] placeholder-[#5BA8D5] bg-white border border-[#5BA8D5] rounded focus:outline-none focus:ring-1 focus:ring-[#5BA8D5]"
-              placeholder="Tu nombre"
-            />
-            {state.errors?.nombre && (
-              <p className="mt-1 text-base text-[#EF284C]">{state.errors.nombre[0]}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="apellido" className="block font-bold text-[#236999] mb-2 text-base">
-              Apellido *
-            </label>
-            <input
-              type="text"
-              id="apellido"
-              name="apellido"
-              required
-              value={apellido}
-              onChange={(e) => setApellido(sanitizeTextoInput(e.target.value))}
-              className="w-full h-12 px-4 text-base text-[#236999] placeholder-[#5BA8D5] bg-white border border-[#5BA8D5] rounded focus:outline-none focus:ring-1 focus:ring-[#5BA8D5]"
-              placeholder="Tu apellido"
-            />
-            {state.errors?.apellido && (
-              <p className="mt-1 text-base text-[#EF284C]">{state.errors.apellido[0]}</p>
-            )}
-          </div>
-
-          <DocumentTypeInput
-            label="Documento"
-            documentNumberName="documento"
-            placeholder="Nro de documento"
-            error={state.errors?.documento?.[0]}
+    <div className="min-h-screen flex items-center justify-center bg-page p-4">
+      <div className="w-full max-w-form bg-card bg-cover bg-center shadow-card px-4 pt-12 pb-12">
+        <div className="bg-white rounded-t-2xl px-4 py-8 flex flex-col items-center gap-6">
+          <Image
+            src={logoForm}
+            alt="Plazas y Parques Conectados"
+            width={359}
+            height={100}
+            className="h-auto w-full max-w-form-logo"
+            priority
           />
 
-          <div>
-            <label htmlFor="celular" className="block font-bold text-[#236999] mb-2 text-base">
-              Celular *
-            </label>
-            <input
-              type="tel"
-              id="celular"
-              name="celular"
-              required
-              value={celular}
-              onChange={(e) => setCelular(sanitizeCelularInput(e.target.value))}
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={10}
-              className="w-full h-12 px-4 text-base text-[#236999] placeholder-[#5BA8D5] bg-white border border-[#5BA8D5] rounded focus:outline-none focus:ring-1 focus:ring-[#5BA8D5]"
-              placeholder="11 1234-5678"
-            />
-            {state.errors?.celular && (
-              <p className="mt-1 text-base text-[#EF284C]">{state.errors.celular[0]}</p>
-            )}
+          <div className="flex flex-col items-center gap-1.5">
+            <h1 className="text-center text-primary font-bold text-title">
+              Conectate gratis en tu plaza
+            </h1>
+            <p className="text-center text-primary font-normal text-2xl">
+              Wi-Fi publico para estudiar, trabajar o comunicarte
+            </p>
           </div>
 
-          <div>
-            <label htmlFor="email" className="block font-bold text-[#236999] mb-2 text-base">
-              Correo electrónico
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className="w-full h-12 px-4 text-base text-[#236999] placeholder-[#5BA8D5] bg-white border border-[#5BA8D5] rounded focus:outline-none focus:ring-1 focus:ring-[#5BA8D5]"
-              placeholder="Opcional"
-            />
-            {state.errors?.email && (
-              <p className="mt-1 text-base text-[#EF284C]">{state.errors.email[0]}</p>
-            )}
-          </div>
-
-          <div className="flex items-start gap-2">
-            <input
-              type="checkbox"
-              id="terms"
-              name="terms"
-              value="true"
-              className="mt-1 h-4 w-4 rounded border-[#5BA8D5] text-[#236999] focus:ring-[#236999]"
-            />
-            <label htmlFor="terms" className="text-sm text-[#3D3D3D]">
-              Acepto los{" "}
-              <a
-                href={`/terminos-y-condiciones?from=/guest/s/${sitioid}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#236999] underline hover:text-[#1F5A85]"
-              >
-                Términos y Condiciones
-              </a>
-            </label>
-          </div>
-          {state.errors?.terms && (
-            <p className="text-base text-[#EF284C]">{state.errors.terms[0]}</p>
+          {state.message && !state.success && (
+            <div className="self-stretch p-3 bg-error/10 border border-error/30 rounded text-error text-sm">
+              {state.message}
+            </div>
           )}
 
-          <button
-            type="submit"
-            disabled={pending}
-            className="w-full h-12 px-4 bg-[#236999] text-white font-bold rounded hover:bg-[#1F5A85] focus:outline-none focus:ring-1 focus:ring-[#236999] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {pending ? "Conectando..." : "Conectarse"}
-          </button>
-        </form>
+          <form action={formAction} className="self-stretch flex flex-col gap-4">
+            <input type="hidden" name="sitioid" value={sitioid} />
+            <input type="hidden" name="apMac" value={apMac} />
+            <input type="hidden" name="deviceMac" value={deviceMac} />
+            <input type="hidden" name="ssid" value={ssid} />
+            <input type="hidden" name="redirectUrl" value={redirectUrl} />
+            <input type="hidden" name="unifiTimestamp" value={unifiTimestamp} />
+
+            <div>
+              <label htmlFor="nombre" className="block font-bold text-primary mb-1 text-base">
+                Nombre *
+              </label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                required
+                value={nombre}
+                onChange={(e) => setNombre(sanitizeTextoInput(e.target.value))}
+                className="w-full h-12 px-4 text-base text-primary placeholder-primary-400 bg-white border border-primary-400 rounded focus:outline-none focus:ring-1 focus:ring-primary-400"
+                placeholder="Escribi un nombre de usuario"
+              />
+              {state.errors?.nombre && (
+                <p className="mt-1 text-base text-error">{state.errors.nombre[0]}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="apellido" className="block font-bold text-primary mb-1 text-base">
+                Apellido *
+              </label>
+              <input
+                type="text"
+                id="apellido"
+                name="apellido"
+                required
+                value={apellido}
+                onChange={(e) => setApellido(sanitizeTextoInput(e.target.value))}
+                className="w-full h-12 px-4 text-base text-primary placeholder-primary-400 bg-white border border-primary-400 rounded focus:outline-none focus:ring-1 focus:ring-primary-400"
+                placeholder="Escribi un nombre de usuario"
+              />
+              {state.errors?.apellido && (
+                <p className="mt-1 text-base text-error">{state.errors.apellido[0]}</p>
+              )}
+            </div>
+
+            <DocumentTypeInput
+              label="Documento"
+              documentNumberName="documento"
+              placeholder="Nro de documento"
+              error={state.errors?.documento?.[0]}
+            />
+
+            <div>
+              <label htmlFor="celular" className="block font-bold text-primary mb-1 text-base">
+                Celular *
+              </label>
+              <input
+                type="tel"
+                id="celular"
+                name="celular"
+                required
+                value={celular}
+                onChange={(e) => setCelular(sanitizeCelularInput(e.target.value))}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={10}
+                className="w-full h-12 px-4 text-base text-primary placeholder-primary-400 bg-white border border-primary-400 rounded focus:outline-none focus:ring-1 focus:ring-primary-400"
+                placeholder="Escribi un nombre de usuario"
+              />
+              {state.errors?.celular && (
+                <p className="mt-1 text-base text-error">{state.errors.celular[0]}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block font-bold text-primary mb-1 text-base">
+                Correo electronico (Opcional)
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="w-full h-12 px-4 text-base text-primary placeholder-primary-400 bg-white border border-primary-400 rounded focus:outline-none focus:ring-1 focus:ring-primary-400"
+                placeholder="Escribi un nombre de usuario"
+              />
+              {state.errors?.email && (
+                <p className="mt-1 text-base text-error">{state.errors.email[0]}</p>
+              )}
+            </div>
+
+            <div className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                id="terms"
+                name="terms"
+                value="true"
+                className="mt-1 h-4 w-4 rounded border-primary-400 text-primary focus:ring-primary"
+              />
+              <label htmlFor="terms" className="text-sm text-foreground">
+                Acepto los{" "}
+                <a
+                  href={`/terminos-y-condiciones?from=/guest/s/${sitioid}`}
+                  className="text-primary underline hover:text-primary-hover"
+                >
+                  terminos y condiciones
+                </a>{" "}
+                de uso del servicio
+              </label>
+            </div>
+            {state.errors?.terms && (
+              <p className="text-base text-error">{state.errors.terms[0]}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={pending}
+              className="w-full h-12 px-4 bg-primary text-white font-bold text-lg rounded hover:bg-primary-hover focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            >
+              {pending ? "Conectando..." : "Conectarse"}
+            </button>
+
+            <div className="flex items-start gap-4 p-4 bg-info-bg border border-info rounded-lg">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                className="shrink-0 mt-0.5"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V11H13V17ZM13 9H11V7H13V9Z"
+                  fill="#0058CC"
+                />
+              </svg>
+              <div className="flex flex-col gap-2">
+                <p className="text-info font-bold text-xl">
+                  Whatsapp de la Comunidad
+                </p>
+                <p className="text-info font-normal text-lg">
+                  Ante cualquier consulta o solicitud escribinos al{" "}
+                  <strong className="underline">1121937726</strong>
+                </p>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <Footer className="rounded-b-2xl" />
       </div>
     </div>
   );
@@ -246,24 +265,22 @@ function DocumentTypeInput({
 
   return (
     <div>
-      <label className="block font-bold text-[#236999] mb-2 text-base">
+      <label className="block font-bold text-primary mb-1 text-base">
         {label} *
       </label>
 
       <input type="hidden" name="tipoDocumento" value="dni" />
 
-      <div ref={dropdownRef} className="relative flex border border-[#5BA8D5] rounded">
+      <div ref={dropdownRef} className="relative flex border border-primary-400 rounded">
         <div className="relative">
           <button
             type="button"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center justify-between px-4 py-3 bg-[#236999] text-white min-w-[88px] h-12 hover:bg-[#1e5a7a] focus:outline-none focus:ring-1 focus:ring-[#5BA8D5] rounded-l"
+            className="flex items-center justify-between px-4 py-3 bg-primary text-white min-w-32 h-12 hover:bg-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-400 rounded-l"
           >
             <span className="text-sm font-medium">DNI</span>
             <div
-              className={`w-4 h-4 flex items-center justify-center transition-transform duration-200 ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 flex items-center justify-center transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
             >
               <svg
                 width="12"
@@ -307,14 +324,12 @@ function DocumentTypeInput({
             pattern="[0-9]*"
             maxLength={DOCUMENT_MAX_LENGTH}
             placeholder={placeholder}
-            className="w-full px-4 py-3 h-12 text-base text-[#236999] placeholder-[#5BA8D5] bg-white rounded-r focus:outline-none focus:ring-1 focus:ring-[#5BA8D5]"
+            className="w-full px-4 py-3 h-12 text-base text-primary placeholder-primary-400 bg-white rounded-r focus:outline-none focus:ring-1 focus:ring-primary-400"
           />
         </div>
       </div>
 
-      {error && (
-        <p className="mt-1 text-base text-[#EF284C]">{error}</p>
-      )}
+      {error && <p className="mt-1 text-base text-error">{error}</p>}
     </div>
   );
 }

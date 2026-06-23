@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import checkmarkIcon from "@/../public/images/checkmark.svg";
 
 export const metadata: Metadata = {
   title: "Bienvenido - WiFi Comunidad",
@@ -23,68 +27,59 @@ async function BienvenidaContent({
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <header className="w-full h-[104px] bg-[#236999] flex items-center justify-center px-2">
-        <span className="text-white font-bold text-lg">WiFi Comunidad</span>
-      </header>
+      <Header />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-8 max-w-[432px] mx-auto w-full">
-        <svg
-          className="mb-6"
-          width="70"
-          height="70"
-          viewBox="0 0 70 70"
-          fill="none"
-        >
-          <path
-            d="M14 38L28 52L56 18"
-            stroke="#2ABB5B"
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+      <main className="flex-1 flex flex-col items-center px-6 py-10 max-w-form mx-auto w-full gap-field">
+        <div className="flex flex-col items-center gap-1.5">
+          <Image
+            src={checkmarkIcon}
+            alt=""
+            width={72}
+            height={71}
+            className="shrink-0"
           />
-        </svg>
+          <h1 className="text-center text-primary font-bold text-title">
+            Listo, ya podes navegar
+          </h1>
+        </div>
 
-        <h1
-          className="text-center text-[#236999] mb-4"
-          style={{
-            fontFamily: "Geometria",
-            fontWeight: 700,
-            fontSize: "40px",
-            lineHeight: "45px",
-          }}
-        >
-          Listo, ya podes navegar
-        </h1>
+        <p className="text-center text-primary font-bold text-2xl max-w-lg">
+          <strong>Parques y plazas conectadas</strong> es un programa del{" "}
+          <strong>Gobierno de la Comunidad</strong> para que los vecinos y
+          vecinas puedan disfrutar de los espacios al aire libre y estar{" "}
+          <strong>conectados a una red de Wifi gratuita.</strong>
+        </p>
 
-        <p
-          className="text-center text-[#3D3D3D] max-w-lg mx-auto px-6 mb-8"
-          style={{
-            fontFamily: "Geometria",
-            fontWeight: 700,
-            fontSize: "24px",
-            lineHeight: "100%",
-          }}
-        >
-          Parques y plazas conectadas es un programa del Gobierno de la Comunidad
-          para que los vecinos y vecinas puedan disfrutar de los espacios al aire
-          libre y estar conectados a una red de Wifi gratuita.
+        <p className="text-center text-primary font-bold text-2xl max-w-lg">
+          Queremos que en las plazas y parques{" "}
+          <strong>
+            puedas estudiar, trabajar, distraerte y estar en comunicacion
+          </strong>{" "}
+          con tus familia y amigos.
+        </p>
+
+        <p className="text-center text-primary font-bold text-2xl max-w-lg">
+          Te pedimos que hagas un{" "}
+          <strong>uso responsable del servicio.</strong>
+        </p>
+
+        <p className="text-center text-primary font-normal text-2xl max-w-lg">
+          Podes cerrar esta ventana
         </p>
 
         <a
           href={redirectUrl}
-          className="inline-block w-full max-w-full h-12 px-4 bg-[#236999] text-white font-bold rounded hover:bg-[#1F5A85] focus:outline-none focus:ring-1 focus:ring-[#236999] focus:ring-offset-2 transition-colors flex items-center justify-center"
+          className="inline-block w-full max-w-full h-12 px-4 bg-primary text-white font-bold text-lg rounded hover:bg-primary-hover focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-2 transition-colors flex items-center justify-center"
         >
           Continuar navegando
         </a>
 
-        <p className="mt-4 text-sm text-[#3D3D3D]">
+        <p className="text-sm text-foreground">
           Seras redirigido automaticamente en 5 segundos...
         </p>
       </main>
 
-      <footer className="w-full h-[91px] bg-[#236999] flex items-center justify-center px-4">
-        <span className="text-white text-sm opacity-60">Aca va el logo</span>
-      </footer>
+      <Footer />
 
       <script
         dangerouslySetInnerHTML={{
