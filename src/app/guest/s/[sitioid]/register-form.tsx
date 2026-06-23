@@ -228,7 +228,14 @@ export function RegisterForm({
                   </p>
                   <p className="text-info font-normal text-lg">
                     Ante cualquier consulta o solicitud escribinos al{" "}
-                    <strong className="underline">1121937726</strong>
+                    <a
+                      href="https://wa.me/5491121937726"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline font-bold hover:opacity-80"
+                    >
+                      1121937726
+                    </a>
                   </p>
                 </div>
               </div>

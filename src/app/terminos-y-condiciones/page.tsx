@@ -129,21 +129,37 @@ export default async function TerminosPage({
                 <>
                   Queda expresamente prohibido utilizar el servicio para:
                   <br />
-                  <br />- Acceder, descargar, almacenar o distribuir contenidos
-                  ilegales, ofensivos, discriminatorios, violentos o que
-                  vulneren derechos de terceros.
-                  <br />- Infringir derechos de propiedad intelectual o
-                  industrial.
-                  <br />- Intentar acceder sin autorizacion a sistemas, redes o
-                  datos de terceros.
-                  <br />- Realizar actividades que puedan afectar la seguridad,
-                  estabilidad o funcionamiento de la red.
-                  <br />- Difundir virus, malware u otros programas informaticos
-                  daninos.
-                  <br />- Utilizar la red para enviar spam, realizar fraudes o
-                  suplantacion de identidad.
-                  <br />- Desarrollar actividades comerciales intensivas que
-                  afecten la disponibilidad del servicio para otros usuarios.
+                  <br />
+                  <ul className="list-disc pl-5 space-y-0.5">
+                    <li>
+                      Acceder, descargar, almacenar o distribuir contenidos
+                      ilegales, ofensivos, discriminatorios, violentos o que
+                      vulneren derechos de terceros.
+                    </li>
+                    <li>
+                      Infringir derechos de propiedad intelectual o industrial.
+                    </li>
+                    <li>
+                      Intentar acceder sin autorizacion a sistemas, redes o
+                      datos de terceros.
+                    </li>
+                    <li>
+                      Realizar actividades que puedan afectar la seguridad,
+                      estabilidad o funcionamiento de la red.
+                    </li>
+                    <li>
+                      Difundir virus, malware u otros programas informaticos
+                      daninos.
+                    </li>
+                    <li>
+                      Utilizar la red para enviar spam, realizar fraudes o
+                      suplantacion de identidad.
+                    </li>
+                    <li>
+                      Desarrollar actividades comerciales intensivas que afecten
+                      la disponibilidad del servicio para otros usuarios.
+                    </li>
+                  </ul>
                 </>
               }
             />
@@ -154,14 +170,22 @@ export default async function TerminosPage({
                 <>
                   El Municipio no sera responsable por:
                   <br />
-                  <br />- Interrupciones, fallas o limitaciones del servicio.
-                  <br />- Perdida de informacion o danos en dispositivos
-                  derivados del uso de la red.
-                  <br />- Contenidos, servicios o sitios web a los que accedan
-                  los usuarios.
-                  <br />- Danos o perjuicios derivados del uso indebido del
-                  servicio por parte de terceros.
                   <br />
+                  <ul className="list-disc pl-5 space-y-0.5">
+                    <li>Interrupciones, fallas o limitaciones del servicio.</li>
+                    <li>
+                      Perdida de informacion o danos en dispositivos derivados
+                      del uso de la red.
+                    </li>
+                    <li>
+                      Contenidos, servicios o sitios web a los que accedan los
+                      usuarios.
+                    </li>
+                    <li>
+                      Danos o perjuicios derivados del uso indebido del servicio
+                      por parte de terceros.
+                    </li>
+                  </ul>
                   <br />
                   El usuario acepta utilizar el servicio bajo su propia y
                   exclusiva responsabilidad.
@@ -238,7 +262,7 @@ function Section({ title, body }: { title: string; body: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-1.5">
       <h2 className="text-primary font-bold text-2xl">{title}</h2>
-      <p className="text-primary font-normal text-lg">{body}</p>
+      <div className="text-primary font-normal text-lg">{body}</div>
     </section>
   );
 }
